@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:world_time/services/world_time.dart';
 
 class ChooseLocation extends StatefulWidget {
   @override
@@ -7,26 +8,29 @@ class ChooseLocation extends StatefulWidget {
 
 class _ChooseLocationState extends State<ChooseLocation> {
 
-  void getData() async {
-    // simulate network request for username
-    String username = await Future.delayed(Duration(seconds: 3), () {
-      return 'yoshi';
+  List<WorldTime> locations = [
+    WorldTime(url: 'Europe/London', location: 'London', flag: 'uk.jpg'),
+    WorldTime(url: 'Europe/Berlin', location: 'Berlin', flag: 'germany.jpg'),
+    WorldTime(url: 'Europe/Athens', location: 'Athens', flag: 'greece.png'),
+    WorldTime(url: 'Africa/Cairo', location: 'Cairo', flag: 'egypt.jpg'),
+    WorldTime(url: 'Africa/Nairobi', location: 'Nairobi', flag: 'kenya.jpg'),
+    WorldTime(url: 'America/Chicago', location: 'Chicago', flag: 'usa.png'),
+    WorldTime(url: 'America/New_York', location: 'New York', flag: 'usa.png'),
+    WorldTime(url: 'Asia/Seoul', location: 'Seoul', flag: 'south_korea.jpg'),
+    WorldTime(url: 'Asia/Jakarta', location: 'Jakarta', flag: 'indonesia.jpg'),
+    WorldTime(url: 'Asia/Hong_Kong', location: 'Hong Kong', flag: 'hong_kong.png'),
+  ];
+
+  void updateTime(index) async {
+    WorldTime instance = locations[index];
+    await instance.getTime();
+    // navigate to home screen
+    Navigator.pop(context, {
+      'location': instance.location,
+      'flag': instance.flag,
+      'time': instance.time,
+      'isDaytime': instance.isDaytime,
     });
-
-    // simulate network request to get bio of the username
-    String bio = await Future.delayed(Duration(seconds: 2), () {
-      return 'vegan, musician & egg collector';
-    });
-
-    print('$username - $bio');
-  }
-
-  @override
-  void initState() {
-    super.initState();
-//    print('initState function ran');
-      getData();
-    print('hey there!');
   }
 
   @override
@@ -39,6 +43,25 @@ class _ChooseLocationState extends State<ChooseLocation> {
         title: Text('Choose a location'),
         centerTitle: true,
         elevation: 0,
+      ),
+      body: ListView.builder(
+        itemCount: locations.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1.0, horizontal: 4.0),
+            child: Card(
+              child: ListTile(
+                onTap: () {
+                  updateTime(index);
+                },
+                title: Text(locations[index].location),
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage('assets/${locations[index].flag}'),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
